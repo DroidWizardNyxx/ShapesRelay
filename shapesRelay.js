@@ -21,29 +21,23 @@ app.post('/api/shape', async (req, res) => {
   const { prompt } = req.body;
   if (!prompt) return res.status(400).json({ error: 'No prompt' });
 
-  const payload = {
-    data: Buffer.from(JSON.stringify({ prompt })).toString('base64'),
-    timestamp: Date.now(),
-  };
-
   try {
     const shapesResponse = await axios.post(
-      'https://api.shapes.inc/v1/hidden-endpoint',
-      payload,
+      'https://api.shapes.inc/v1/chat/completions',
+      {
+        model: 'gpt-4.1',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7
+      },
       {
         headers: {
-          'Authorization': `Bearer ${nextToken()}`,
-          'X-Request-ID': Math.random().toString(36).slice(2),
-          'User-Agent': `DiscordBot/${Date.now()}`
+          Authorization: `Bearer ${nextToken()}`
         },
         timeout: 10000
       }
     );
 
-    const decoded = Buffer.from(shapesResponse.data.data, 'base64').toString();
-    const parsed = JSON.parse(decoded);
-
-    res.json({ response: parsed.response });
+    res.json({ response: shapesResponse.data.choices[0].message.content });
   } catch (err) {
     console.error('Erro Shapes:', err.response?.data || err.message);
     res.status(500).json({ error: 'Erro no servidor Shapes' });
