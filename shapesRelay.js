@@ -29,40 +29,49 @@ app.post('/api/shape', async (req, res) => {
   console.log('🔍 Prompt recebido:', prompt);
 
   if (!prompt || typeof prompt !== 'string') {
+    console.error('❌ Prompt inválido ou ausente:', prompt);
     return res.status(400).json({ error: 'Prompt inválido ou ausente' });
   }
 
   try {
-    console.log('📦 Payload enviado para Shapes:', {
+    const payload = {
       model: `shapesinc/${SHAPE_USERNAME}`,
       messages: [
         { role: 'user', content: prompt }
       ]
-    });
+    };
+
+    console.log('📦 Payload enviado para Shapes:', payload);
 
     const response = await axios.post(
       'https://api.shapes.inc/v1/chat/completions',
-      {
-        model: `shapesinc/${SHAPE_USERNAME}`,
-        messages: [
-          { role: 'user', content: prompt }
-        ]
-      },
+      payload,
       {
         headers: {
           Authorization: `Bearer ${nextToken()}`,
           'Content-Type': 'application/json'
         },
-        timeout: 10000
+        timeout: 15000 // Increased timeout to 15 seconds
       }
     );
 
     const reply = response.data.choices?.[0]?.message?.content || 'Sem resposta.';
+    console.log('✅ Resposta recebida da Shapes:', reply);
+
     res.json({ response: reply });
 
   } catch (err) {
-    console.error('❌ Erro Shapes:', err.response?.data || err.message);
-    res.status(500).json({ error: 'Erro ao se comunicar com Shapes' });
+    // Log full error details for debugging
+    console.error('❌ Erro Shapes:', {
+      message: err.message,
+      response: err.response?.data || 'No response data',
+      status: err.response?.status || 'No status'
+    });
+
+    res.status(500).json({
+      error: 'Erro ao se comunicar com Shapes',
+      details: err.response?.data || err.message
+    });
   }
 });
 
