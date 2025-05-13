@@ -31,10 +31,16 @@ app.post('/api/shape', async (req, res) => {
   if (!prompt || typeof prompt !== 'string') {
     return res.status(400).json({ error: 'Prompt inválido ou ausente' });
   }
+  
+console.log('📦 Payload enviado para Shapes:', {
+  model: `shapesinc/${SHAPE_USERNAME}`,
+  messages: [
+    { role: 'user', content: prompt }
+  ]
+});
 
-  try {
-    const response = await axios.post(
-      'https://api.shapes.inc/v1/chat/completions',
+const response = await axios.post(
+  'https://api.shapes.inc/v1/chat/completions',
       {
         model: `shapesinc/${SHAPE_USERNAME}`,
         messages: [
