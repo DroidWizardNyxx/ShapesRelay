@@ -50,6 +50,12 @@ app.post('/api/shape', async (req, res) => {
     const reply = response.data.choices?.[0]?.message?.content || 'Sem resposta.';
     res.json({ response: reply });
 
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor ShapesRelay rodando na porta ${PORT}`);
+});
+
+
   } catch (err) {
     console.error('❌ Erro Shapes:', err.response?.data || err.message);
     res.status(500).json({ error: 'Erro ao se comunicar com Shapes' });
