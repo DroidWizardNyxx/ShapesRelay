@@ -22,14 +22,21 @@ const SHAPE_USERNAME = process.env.SHAPE_USERNAME;
 
 app.post('/api/shape', async (req, res) => {
   const { prompt } = req.body;
-  if (!prompt) return res.status(400).json({ error: 'No prompt' });
+  
+  console.log('🔍 Prompt recebido:', prompt);
+
+  if (!prompt || typeof prompt !== 'string') {
+    return res.status(400).json({ error: 'Prompt inválido ou ausente' });
+  }
 
   try {
     const response = await axios.post(
       'https://api.shapes.inc/v1/chat/completions',
       {
         model: `shapesinc/${SHAPE_USERNAME}`,
-        messages: [{ role: 'user', content: prompt }]
+        messages: [
+          { role: 'user', content: prompt }
+        ]
       },
       {
         headers: {
@@ -40,14 +47,11 @@ app.post('/api/shape', async (req, res) => {
       }
     );
 
-    res.json({ response: response.data.choices[0].message.content });
-  } catch (err) {
-    console.error('Erro Shapes:', err.response?.data || err.message);
-    res.status(500).json({ error: 'Erro no servidor Shapes' });
-  }
-});
+    const reply = response.data.choices?.[0]?.message?.content || 'Sem resposta.';
+    res.json({ response: reply });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Relay online na porta ${PORT}`);
+  } catch (err) {
+    console.error('❌ Erro Shapes:', err.response?.data || err.message);
+    res.status(500).json({ error: 'Erro ao se comunicar com Shapes' });
+  }
 });
