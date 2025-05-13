@@ -33,46 +33,45 @@ app.post('/api/shape', async (req, res) => {
     return res.status(400).json({ error: 'Prompt inválido ou ausente' });
   }
 
-  try {
-    const payload = {
-      model: `shapesinc/${SHAPE_USERNAME}`,
-      messages: [
-        { role: 'user', content: prompt }
-      ]
-    };
+try {
+  const payload = {
+    model: `shapesinc/${SHAPE_USERNAME}`,
+    messages: [
+      { role: 'user', content: prompt }
+    ]
+  };
 
-    console.log('📦 Payload enviado para Shapes:', payload);
+  console.log('📦 Payload enviado para Shapes:', JSON.stringify(payload, null, 2));
 
-    const response = await axios.post(
-      'https://api.shapes.inc/v1/chat/completions',
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${nextToken()}`,
-          'Content-Type': 'application/json'
-        },
-        timeout: 15000 // Increased timeout to 15 seconds
-      }
-    );
+  const response = await axios.post(
+    'https://api.shapes.inc/v1/chat/completions',
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${nextToken()}`,
+        'Content-Type': 'application/json'
+      },
+      timeout: 15000
+    }
+  );
 
-    const reply = response.data.choices?.[0]?.message?.content || 'Sem resposta.';
-    console.log('✅ Resposta recebida da Shapes:', reply);
+  console.log('✅ Resposta recebida da Shapes:', JSON.stringify(response.data, null, 2));
 
-    res.json({ response: reply });
+  const reply = response.data.choices?.[0]?.message?.content || 'Sem resposta.';
+  res.json({ response: reply });
 
-  } catch (err) {
-    // Log full error details for debugging
-    console.error('❌ Erro Shapes:', {
-      message: err.message,
-      response: err.response?.data || 'No response data',
-      status: err.response?.status || 'No status'
-    });
+} catch (err) {
+  console.error('❌ Erro Shapes:', {
+    message: err.message,
+    response: err.response?.data || 'No response data',
+    status: err.response?.status || 'No status'
+  });
 
-    res.status(500).json({
-      error: 'Erro ao se comunicar com Shapes',
-      details: err.response?.data || err.message
-    });
-  }
+  res.status(500).json({
+    error: 'Erro ao se comunicar com Shapes',
+    details: err.response?.data || err.message
+  });
+}
 });
 
 // ⚠️ ESSENCIAL para o Render detectar a porta aberta
