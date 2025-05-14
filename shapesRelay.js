@@ -54,7 +54,7 @@ app.post('/api/shape', async (req, res) => {
   'Content-Type': 'application/json',
   'X-User-Id': req.body.user_id,
   'X-Channel-Id': req.body.channel_id
-}
+},
           
         timeout: 10000
       }
