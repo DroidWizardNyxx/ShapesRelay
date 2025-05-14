@@ -37,8 +37,16 @@ app.post('/api/shape', async (req, res) => {
     const payload = {
       model: `shapesinc/${SHAPE_USERNAME}`,
       messages: [
-        { role: 'user', content: prompt }
-      ]
+  {
+    role: 'user',
+    content: [
+      {
+        type: 'text',
+        text: prompt
+      }
+    ]
+  }
+]
     };
 
     console.log('📦 Payload sent to Shapes:', JSON.stringify(payload, null, 2));
