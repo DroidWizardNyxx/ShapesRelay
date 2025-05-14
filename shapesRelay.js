@@ -7,51 +7,44 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Tokens for authenticating with the Shapes API
+// Tokens para autenticação rotativa
 const TOKENS = [
   process.env.SHAPES_TOKEN_1,
   process.env.SHAPES_TOKEN_2,
 ];
-
 let tokenIndex = 0;
 const nextToken = () => {
   tokenIndex = (tokenIndex + 1) % TOKENS.length;
   return TOKENS[tokenIndex];
 };
 
-// Shape username configured in the Shapes panel
+// Nome da shape configurado no .env
 const SHAPE_USERNAME = process.env.SHAPE_USERNAME;
 
-// Endpoint that the bot calls
+// Endpoint de uso pelo bot
 app.post('/api/shape', async (req, res) => {
   const { prompt } = req.body;
 
-  console.log('🔍 Prompt received:', prompt);
+  console.log('🔍 Prompt recebido:', prompt);
 
   if (!prompt || typeof prompt !== 'string') {
-    console.error('❌ Invalid or missing prompt:', prompt);
-    return res.status(400).json({ error: 'Invalid or missing prompt' });
+    return res.status(400).json({ error: 'Prompt inválido ou ausente' });
   }
 
-  try {
-    const payload = {
-      model: `shapesinc/${SHAPE_USERNAME}`,
-      messages: [
-  {
-    role: 'user',
-    content: [
+  const payload = {
+    model: `shapesinc/${SHAPE_USERNAME}`,
+    messages: [
       {
-        type: 'text',
-        text: prompt
+        role: 'user',
+        content: prompt  // <=== Aqui tá o segredo do sucesso
       }
     ]
-  }
-]
-    };
+  };
 
-    console.log('📦 Payload sent to Shapes:', JSON.stringify(payload, null, 2));
-    console.log('🔑 Using token:', TOKENS[tokenIndex]);
+  console.log('📦 Enviando payload:', payload);
+  console.log('🔑 Usando token:', nextToken());
 
+  try {
     const response = await axios.post(
       'https://api.shapes.inc/v1/chat/completions',
       payload,
@@ -60,31 +53,20 @@ app.post('/api/shape', async (req, res) => {
           Authorization: `Bearer ${nextToken()}`,
           'Content-Type': 'application/json'
         },
-        timeout: 15000
+        timeout: 10000
       }
     );
 
-    console.log('✅ Response received from Shapes:', JSON.stringify(response.data, null, 2));
-
-    const reply = response.data.choices?.[0]?.message?.content || 'No response.';
+    const reply = response.data.choices?.[0]?.message?.content || 'Sem resposta da Shape.';
     res.json({ response: reply });
-
   } catch (err) {
-    console.error('❌ Error with Shapes API:', {
-      message: err.message,
-      response: err.response?.data || 'No response data',
-      status: err.response?.status || 'No status'
-    });
-
-    res.status(500).json({
-      error: 'Error communicating with Shapes',
-      details: err.response?.data || err.message
-    });
+    console.error('❌ Erro Shapes:', err.response?.data || err.message);
+    res.status(500).json({ error: 'Erro ao se comunicar com Shapes' });
   }
 });
 
-// Essential for Render to detect the open port
+// Essencial para o Render detectar que seu servidor está no ar
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`✅ Relay active on port ${PORT}`);
+  console.log(`✅ Relay ativo na porta ${PORT}`);
 });
