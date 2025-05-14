@@ -50,9 +50,12 @@ app.post('/api/shape', async (req, res) => {
       payload,
       {
         headers: {
-          Authorization: `Bearer ${nextToken()}`,
-          'Content-Type': 'application/json'
-        },
+  Authorization: `Bearer ${nextToken()}`,
+  'Content-Type': 'application/json',
+  'X-User-Id': req.body.user_id,
+  'X-Channel-Id': req.body.channel_id
+}
+          
         timeout: 10000
       }
     );
