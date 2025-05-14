@@ -68,6 +68,10 @@ app.post('/api/shape', async (req, res) => {
   }
 });
 
+app.get('/ping', (req, res) => {
+  res.status(200).send('Pong');
+});
+
 // Essencial para o Render detectar que seu servidor está no ar
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
