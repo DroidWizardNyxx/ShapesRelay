@@ -56,7 +56,7 @@ app.post('/api/shape', async (req, res) => {
   'X-Channel-Id': req.body.channel_id
 },
           
-        timeout: 10000
+        timeout: 20000
       }
     );
 
