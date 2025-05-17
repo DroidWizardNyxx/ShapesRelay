@@ -20,10 +20,11 @@ Using an alternate account ensures your main account remains safe.
 ## ✅ What does Shapes Relay do?
 
 - Receives formatted payloads from Discord bots
-- Forwards the content to [Shapes API](https://api.shapes.inc/v1/)
+- Forwards the content to [Shapes API](https://github.com/shapesinc/shapes-api)
 - Returns the AI-generated response for your bot to reply
 - Supports:
   - Plain text
+  - (Below may not work, im still trying to find a fix)
   - Text + image
   - Text + audio
   - Structured callback responses
@@ -44,8 +45,8 @@ Using an alternate account ensures your main account remains safe.
 Clone the repository:
 
 ```bash
-git clone https://github.com/your-org/shapes-relay
-cd shapes-relay
+git clone https://github.com/DroidWizardNyxx/ShapesRelay
+cd DroidWizardNyxx/ShapesRelay
 npm install
 ```
 
